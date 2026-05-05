@@ -15,7 +15,7 @@ export class AuthController{
         try{
             const {email}=req.body;
             const result=await this.authService.signUp(email);
-
+            console.log(result);
             return Responder.success(res,result,SuccessCode[100],200,100);
         }catch(error){
             next(error)
@@ -28,7 +28,7 @@ export class AuthController{
 
         try{
             const result:any=await this.authService.otpVerification(req.body);
-            
+            console.log(result);
             return Responder.success(res,result,SuccessCode[101],201,101);
         }catch(error){
             next(error);

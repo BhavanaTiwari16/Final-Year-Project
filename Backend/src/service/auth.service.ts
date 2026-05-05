@@ -1,11 +1,9 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto"
 import { User } from "../models/User";
-import { Token } from "../models/Token";
 import { AppError } from "../utils/AppError";
 import { EmailVerification } from "../models/EmailVerification";
 import { mailService } from "../utils/mail.instance";
-import { Responder } from "../utils/Responder";
 import { TokenUtil } from "../utils/token.Util";
 import { ERROR_MESSAGE } from "../common/constants/errorCode.Constant";
 import { UserRole } from "../common/enums/userRole.enum";
@@ -25,18 +23,11 @@ export class AuthService{
                 if (existingUser?.isRegistered===true) {
                     throw new AppError(ERROR_MESSAGE[155],400,155);
                 }
-                const otp:string=(Math.floor(Math.random() * (100000- 10000 + 1)) + 100).toString();
+                const otp:string=Math.floor(100000 + Math.random() * 900000).toString();
                 
         //if already otp exist for given email then update the previous entry 
                 await EmailVerification.upsert({email,otp});
-                interface result{
-                    msg:string;
-                    previewUrl:string|false;
-                }
-                
                 const op=await mailService.sendMail(email,"One Time Password",`OTP:${otp}`);
-                
-                const message:result={msg:`Otp Sent Succesfully`,previewUrl:op};
                 return{
                     msg:"Otp Sent Successfully",
                     op
@@ -100,7 +91,15 @@ export class AuthService{
     //register Service or On-boarding 
     public async registerUser(data:any,tokendata:any){
         
-        const{email:dataEmail,name,password,ph_no,role}=data;
+        const { 
+  email: dataEmail, 
+  firstName, 
+  lastName, 
+  stage,
+  password, 
+  ph_no, 
+  role 
+} = data;
         const{id,email:tokenEmail}=tokendata;
         console.log(dataEmail);
         console.log(tokenEmail);
@@ -116,18 +115,22 @@ export class AuthService{
             throw new AppError(ERROR_MESSAGE[154],400,154);
         }
 
-        const role_val=role.toUpperCase();
+        const role_val = (role as string).toUpperCase() as UserRole;
+        const allowedRoles: UserRole[] = [UserRole.USER, UserRole.AUTHOR, UserRole.DOCTOR];
 
-        if(role_val!==UserRole.USER){
-            throw new AppError(ERROR_MESSAGE[150],400,150)
+        if(!allowedRoles.includes(role_val)){
+            throw new AppError(ERROR_MESSAGE[152], 400, 152);
         }
+
         user.set({
-            name,
-            password:hashP,
-            ph_no,
-            role:UserRole.USER,
-            isRegistered:true
-        })
+          firstName,
+          lastName,
+          stage:    stage    || null,
+          password: hashP,
+          ph_no,
+          role:     role_val,
+          isRegistered: true
+        });
         await user.save();
 
         return user;
@@ -164,8 +167,16 @@ export class AuthService{
             refresh_token:rtoken
           })
           const response={
-            acess_token:atoken,
-            refresh_token:rtoken
+            access_token:atoken,
+            refresh_token:rtoken,
+            user:{
+              id:user.id,
+              email:user.email,
+              firstName:user.firstName,
+              lastName:user.lastName,
+              stage:user.stage,
+              role:user.role
+            }
           }
           return response;
     }
@@ -224,24 +235,20 @@ export class AuthService{
         }
 
          const otp = crypto.randomBytes(32).toString("hex");
-            await EmailVerification.create({email,otp});
-          const reset_link=`${process.env.LOCALHOST_LINK}/reset-password-link/${otp}`//make server name as env variable
-            interface result{
-                msg:string;
-                previewUrl:string|false;
-            }
+            await EmailVerification.upsert({email,otp});
+          const reset_link=`${process.env.LOCALHOST_LINK}/reset-password-link/${otp}`;
 
         const op=await mailService.sendMail(email,"Link to RESET PASSWORD",
             `Please click the following link to reset your password \n ${reset_link}`
         );
-        
+
         return {
             op
         };
       }
 
     // reset password
-      public async resetPassword(data:any,otp:string|false){
+      public async resetPassword(data:any,otp:string){
         
         const{newPassword}=data;
         const record:any=await EmailVerification.findOne({where:{otp}});
@@ -260,9 +267,8 @@ export class AuthService{
         }
 
         const hash=await bcrypt.hash(newPassword,10);
-        user.password=hash
-
-        const result=await user.save();
+        user.password=hash;
+        await user.save();
         return user;
       }
 

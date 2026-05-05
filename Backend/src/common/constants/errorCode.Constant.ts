@@ -7,6 +7,6 @@ export const ERROR_MESSAGE={
     155:"Already Registered",
     156:"Invalid OTP",
     157:"User Does Not Exist",
-    158:"Not FOund",
+    158:"Not Found",
     159:"No Active Session",
 }

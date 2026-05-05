@@ -7,8 +7,12 @@ import express from "express";
 import { db } from "./config/db";
 import cors from "cors";
 
-import { ErrorHandler } from "./middlewares/errorhadler";
-import authRoutes from "./routes/auth.routes"
+import { ErrorHandler } from "./middlewares/errorHandler";
+import authRoutes  from "./routes/auth.routes";
+import blogRoutes  from "./routes/blog.routes";
+import topicRoutes from "./routes/topic.routes";
+import userRoutes  from "./routes/user.routes";
+import { AssociationMapping } from "./models/Association";
 
 class Server{
     private port:number
@@ -26,10 +30,10 @@ class Server{
     }
 
     private initializedRoutes(){
-        this.app.use("/",authRoutes);
-        this.app.use("/index",(req,res)=>{
-            res.send("HEllo World");
-        })
+        this.app.use("/", authRoutes);
+        this.app.use("/blogs", blogRoutes);
+        this.app.use("/topics", topicRoutes);
+        this.app.use("/users", userRoutes);
     }
 
     private initializedErrorHandler(){
@@ -43,6 +47,7 @@ class Server{
 
     private async initializeDb(){
         await db.connectDb();
+        AssociationMapping.initialize();
     }
 
     public async start(){

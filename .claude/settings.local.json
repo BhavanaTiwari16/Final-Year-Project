@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(head -50)",
+      "Bash(Get-ChildItem -Path \"d:\\\\Final_year_project\\\\project\\\\Final-Year-Project\" -Recurse -File)",
+      "Bash(Select-Object FullName)",
+      "PowerShell(Rename-Item \"d:\\\\Final_year_project\\\\project\\\\Final-Year-Project\\\\Backend\\\\src\\\\middlewares\\\\errorhadler.ts\" \"errorHandler.ts\")"
+    ]
+  }
+}

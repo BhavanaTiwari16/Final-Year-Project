@@ -1,5 +1,4 @@
 
-import { response } from "express";
 import nodemailer,{Transporter} from "nodemailer";
 
 export class MailService{
@@ -19,7 +18,7 @@ export class MailService{
 
     public async sendMail(to:string,subject:string,text:any){
         const info=await this.transporter.sendMail({
-            from:`"E-COMMERCE "<${process.env.MAIL_USER}>`,
+            from:`"Serenova" <${process.env.MAIL_USER}>`,
             to,
             subject,
             text
@@ -28,10 +27,10 @@ export class MailService{
         console.log("Message Id:",info.messageId);
 
         console.log("Preview Url:",nodemailer.getTestMessageUrl(info));
-        return `{previewurl:${nodemailer.getTestMessageUrl(info)}`;
+        return nodemailer.getTestMessageUrl(info);
     }
 }
 
 
 
-export const mailService=new MailService();;
+export const mailService=new MailService();

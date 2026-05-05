@@ -4,7 +4,7 @@ export class ApiResponse<T>{
     public data?:T;//creating it with generic type template datatype making it more type safe as compared to any 
     public custom_statusCode?:number|string;
     constructor(success:boolean,message:string,data?:T,custom_statusCode?:number|string){
-        this.success=success;``
+        this.success=success;
         this.message=message;
         if(data!==undefined){
             this.data=data;

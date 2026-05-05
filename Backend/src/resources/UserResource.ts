@@ -3,7 +3,9 @@ export class UserResource{
        return {
            id:user.id,
            email:user.email,
-           name:user.name,
+           firstName:user.firstName,
+           lastName:user.lastName,
+           stage:user.stage,
            role:user.role,
            isRegistered:user.isRegistered
         }

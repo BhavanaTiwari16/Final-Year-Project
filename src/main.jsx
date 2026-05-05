@@ -53,17 +53,24 @@ function handleLogin() {
     });
 }
 
-// ✅ REGISTER (FIXED)
+// Legacy DOM handler — registration is handled by Auth.jsx component
 function handleRegister() {
   const firstName = document.getElementById("reg-firstname")?.value;
   const lastName = document.getElementById("reg-lastname")?.value;
   const email = document.getElementById("reg-email")?.value;
   const password = document.getElementById("reg-password")?.value;
 
+  if (!firstName || !lastName || !email || !password) {
+    console.error("Registration inputs missing");
+    return;
+  }
+
+  const token = localStorage.getItem("access_token");
   const data = {
-    name: `${firstName}${lastName}`, // 👈 THIS LINE HERE
+    firstName,
+    lastName,
     email,
-    password: "Password@123"
+    password
   };
 
   const btn = document.querySelector('#panel-register .btn-submit');
@@ -71,7 +78,7 @@ function handleRegister() {
 
   btn.textContent = 'Creating your safe space…';
 
-  register(data)
+  register(data, { headers: { Authorization: `Bearer ${token}` } })
     .then(() => {
       btn.textContent = '✓ Account created 🌸';
     })

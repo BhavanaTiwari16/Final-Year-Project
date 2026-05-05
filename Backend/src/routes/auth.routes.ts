@@ -30,13 +30,12 @@ export class AuthRoutes{
         this.router.post("/verify",AuthValidator.verify(),ValidateRequest.handle,this.controller.verifyOtp);
         //register
         this.router.post(
-                "/register",
-                AuthValidator.register(),ValidateRequest.handle,this.token.verifyRegisterToken,this.controller.registerUser
+                "/register",this.token.verifyRegisterToken,AuthValidator.register(),ValidateRequest.handle,this.controller.registerUser
         );
         //login
         this.router.post("/login",AuthValidator.login(),ValidateRequest.handle,this.controller.login);
         //newAcessToken
-        this.router.get("/newAcessToken",this.token.verifyRefreshToken,this.controller.newAToken);
+        this.router.get("/newAccessToken",this.token.verifyRefreshToken,this.controller.newAToken);
         //logout
         this.router.post("/logout",this.token.verifyRefreshToken,this.controller.logoutUser);
         //forget-password

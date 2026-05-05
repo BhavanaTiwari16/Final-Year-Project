@@ -4,21 +4,25 @@ import { UserRole } from "../common/enums/userRole.enum";
 const sequelize=db.getInstance();
 //using encapsulation we are trying to get instance Of the sequelize object which is maintianing the connections,so that we can use its functions
 
-interface UserAttributes{
-    id?:number;
-    email:string;
-    name?:string;
-    password?:string;
-    ph_no?:string
-    role?:UserRole
-    isRegistered?:boolean;
+interface UserAttributes {
+    id?: number;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    stage?: string;   // 👈 ADD THIS
+    password?: string;
+    ph_no?: string;
+    role?: UserRole;
+    isRegistered?: boolean;
 }
-interface UserCreationAttributes extends Optional<UserAttributes,"id"|"name"|"password"|"ph_no"|"role"|"isRegistered">{}
+interface UserCreationAttributes extends Optional<UserAttributes,"id"|"isRegistered">{}
 
 export class User extends Model<UserAttributes,UserCreationAttributes>implements UserAttributes{
     declare id:number;
     declare email: string;
-    declare name?:string;
+    declare firstName?:string;
+    declare lastName?:string;
+    declare stage?:string;
     declare password?: string;
     declare ph_no?: string;
     declare role?: UserRole;
@@ -40,7 +44,13 @@ User.init(
             isEmail:true
         }
        },
-       name:{
+       firstName:{
+        type:DataTypes.STRING,
+       },
+       lastName:{
+        type:DataTypes.STRING,
+       },
+       stage:{
         type:DataTypes.STRING,
        },
        password:{
